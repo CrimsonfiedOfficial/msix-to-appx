@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MSIXBundle to AppxBundle Converter</title>
+</head>
+<body>
+    <h1>MSIXBundle to AppxBundle Converter</h1>
+    <form id="converter-form" enctype="multipart/form-data">
+        <label for="msixbundle-file">Select MSIXBundle file:</label>
+        <input type="file" id="msixbundle-file" name="msixbundle" accept=".msixbundle">
+        <button type="submit">Convert</button>
+    </form>
+    <a id="download-link" style="display: none;" download>Download AppxBundle</a>
+
+    <script>
+        document.getElementById("converter-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            fetch("/convert", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const downloadLink = document.getElementById("download-link");
+                const msixbundleName = formData.get("msixbundle").name;
+                const appxbundleName = msixbundleName.replace(".msixbundle", ".appxbundle");
+
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = appxbundleName;
+                downloadLink.style.display = "block";
+            });
+        });
+    </script>
+</body>
+</html>
